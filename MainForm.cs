@@ -56,14 +56,14 @@ The Prelude, lines 381-389";
 
         public MainForm()
         {
-            InitializeComponent();
-            _app = new IVisio.Application();
-            var docs = _app.Documents;
+            this.InitializeComponent();
+            MainForm._app = new Application();
+            var docs = MainForm._app.Documents;
             var doc = docs.Add("");
             this.allfontnames = doc.Fonts.AsEnumerable().Select(f => f.Name).OrderBy( s=>s).ToList();
 
-            this.comboBoxFont1.DataSource = allfontnames.ToList();
-            this.comboBoxFont2.DataSource = allfontnames.ToList();
+            this.comboBoxFont1.DataSource = this.allfontnames.ToList();
+            this.comboBoxFont2.DataSource = this.allfontnames.ToList();
 
             this.comboBoxFont1.Text = "Arial";
             this.comboBoxFont2.Text = "Calibri";
@@ -99,7 +99,7 @@ The Prelude, lines 381-389";
 
             var fci = new FontCompareInput();
 
-            var docs = _app.Documents;
+            var docs = MainForm._app.Documents;
             fci.Document = docs.Add("");
             var dfonts = fci.Document.Fonts;
             fci.TargetFontNames = new List<string> { this.comboBoxFont1.Text, this.comboBoxFont2.Text };
@@ -109,7 +109,7 @@ The Prelude, lines 381-389";
 
 
             fci.FontSizeFormulas = new List<string> { "8pt", "10pt", "12pt", "14pt", "18pt", "28pt" };
-            fci.TextBlocks = new[] { text1, text2, text3, text4 };
+            fci.TextBlocks = new[] {this.text1, this.text2, this.text3, this.text4 };
             fci.LabelFontID = dfonts[labelfont].ID;
             fci.TargetFontIDs = fci.TargetFontNames.Select(f => dfonts[f].ID).ToList();
 
@@ -119,7 +119,7 @@ The Prelude, lines 381-389";
             {
                 if (fci.Styles[i]!=VA.Text.CharStyle.None)
                 {
-                    var sb = new System.Text.StringBuilder();
+                    var sb = new StringBuilder();
                     sb.Append(fci.TargetFontNames[i]);
                     sb.Append(" (");
                     var tokens = new List<string>();
@@ -142,9 +142,9 @@ The Prelude, lines 381-389";
                 }
             }
             var first_page = fci.Document.Pages[1];
-            compate_text_blocks(fci);
-            compare_glyph_chart(fci);
-            compare_glyphs(fci);
+            this.compate_text_blocks(fci);
+            this.compare_glyph_chart(fci);
+            this.compare_glyphs(fci);
             first_page.Delete(1);
         }
 
@@ -291,7 +291,7 @@ The Prelude, lines 381-389";
                 var font = fci.TargetFontNames[fi];
 
                 var trect = new VA.Drawing.Rectangle(0, cy - 1.0, 10, cy);
-                var xshape = new VA.DOM.Shape(rectmaster, stencilname, trect.Center);
+                var xshape = new VA.DOM.Shape(this.rectmaster, this.stencilname, trect.Center);
                 xshape.Cells.Width = trect.Size.Width;
                 xshape.Cells.Height = trect.Size.Height;
                 dom_page.Shapes.Add(xshape);
@@ -313,7 +313,7 @@ The Prelude, lines 381-389";
                         double x = 0 + (1.0) * c;
                         var rect = new VA.Drawing.Rectangle(x, cy, x + 0.5, cy + 0.5);
 
-                        var shape = new VA.DOM.Shape(rectmaster, stencilname, rect.Center);
+                        var shape = new VA.DOM.Shape(this.rectmaster, this.stencilname, rect.Center);
                         shape.Cells.Width = rect.Width;
                         shape.Cells.Height = rect.Height;
 
@@ -343,7 +343,7 @@ The Prelude, lines 381-389";
 
             var text =
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvqxyz1234567890«»ßäüöĆćŚśŹźŻżĄąĘę!@#$%^&*()`~_-+=[]{}\\|;:'\",.<>/?";
-            var texts = Split(text, 10);
+            var texts = MainForm.Split(text, 10);
 
             var pages = fci.Document.Pages;
             double col_width = 3.0;
@@ -367,7 +367,7 @@ The Prelude, lines 381-389";
                         double right = left + col_width;
                         double top = cy;
                         var rect = new VA.Drawing.Rectangle(left, title_bottom, right, top);
-                        var char_sample_title_shape = new VA.DOM.Shape(rectmaster, stencilname, rect);
+                        var char_sample_title_shape = new VA.DOM.Shape(this.rectmaster, this.stencilname, rect);
                         char_sample_title_shape.Cells.Width = rect.Width;
                         char_sample_title_shape.Cells.Height = rect.Height;
 
@@ -383,7 +383,7 @@ The Prelude, lines 381-389";
 
                     double overlay_title_right = overlay_title_left + col_width;
                     var rectangle = new VA.Drawing.Rectangle(overlay_title_left, title_bottom, overlay_title_right, cy);
-                    var overlay_title_shape = new VA.DOM.Shape(rectmaster, stencilname, rectangle);
+                    var overlay_title_shape = new VA.DOM.Shape(this.rectmaster, this.stencilname, rectangle);
                     dom_page.Shapes.Add(overlay_title_shape);
                     overlay_title_shape.Cells.FillPattern = 0;
                     overlay_title_shape.Cells.LinePattern = 0;
@@ -392,7 +392,8 @@ The Prelude, lines 381-389";
                     overlay_title_shape.Cells.CharTransparency = "0.3";
                     for (int k = 0; k < fci.TargetFontNames.Count(); k++)
                     {
-                        var el = overlay_title_shape.Text.AddElement(fci.TargetFontDisplayNames[k] + "\n");
+                        var s = fci.TargetFontDisplayNames[k] + "\n";
+                        var el = overlay_title_shape.Text.AddElement(s);
                         el.CharacterCells.Color = (new VA.Drawing.ColorRGB(colorints[k % colorints.Count()])).ToFormula();
                         el.CharacterCells.Font = fci.TargetFontIDs[k];
                     }
@@ -408,7 +409,7 @@ The Prelude, lines 381-389";
                         double y0 = cy - sample_height;
                         double y1 = cy;
                         var rect = new VA.Drawing.Rectangle(x0, y0, x1, y1);
-                        var char_sample_shape = new VA.DOM.Shape(rectmaster,stencilname,rect.Center);
+                        var char_sample_shape = new VA.DOM.Shape(this.rectmaster, this.stencilname,rect.Center);
                         char_sample_shape.Cells.Width = rect.Width;
                         char_sample_shape.Cells.Height = rect.Height;
 
@@ -428,7 +429,7 @@ The Prelude, lines 381-389";
                         double overlay_right = overlay_left + col_width;
                         var rect = new VA.Drawing.Rectangle(overlay_left, cy - col_width, overlay_right, cy);
 
-                        var overlay_shape = new VA.DOM.Shape(rectmaster,stencilname,rect.Center);
+                        var overlay_shape = new VA.DOM.Shape(this.rectmaster, this.stencilname,rect.Center);
                         overlay_shape.Cells.Width = rect.Width;
                         overlay_shape.Cells.Height = rect.Height;
 
@@ -467,7 +468,7 @@ The Prelude, lines 381-389";
 
         private void buttonRun_Click(object sender, EventArgs e)
         {
-            FontCompare();
+            this.FontCompare();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
