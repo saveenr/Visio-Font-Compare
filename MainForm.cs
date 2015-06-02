@@ -260,8 +260,8 @@ The Prelude, lines 381-389";
 
 
                         shape_3.CellsU["Height"].FormulaU = "TEXTHEIGHT(TheText,TxtWidth)";
-                        var cell3_real_size = new VA.Drawing.Size(shape_3.CellsU["Width"].get_Result(null),
-                                                                  shape_3.CellsU["Height"].get_Result(null));
+                        var cell3_real_size = new VA.Drawing.Size(shape_3.CellsU["Width"].Result[null],
+                                                                  shape_3.CellsU["Height"].Result[null]);
                         shape_3.CellsU["PinY"].FormulaU = (cell2_bottom - (cell3_real_size.Height / 2.0)).ToString();
 
                         cell2_top -= cell2_h + cell3_real_size.Height + vs;
