@@ -160,46 +160,46 @@ The Prelude, lines 381-389";
             double cell_sep = 0.5;
             string labeltextcolor = "rgb(0,176,240)";
 
-            var char1 = new VA.Text.CharacterFormatCells();
+            var char1 = new VA.Text.CharacterCells();
             char1.Font = fci.LabelFontID;
             char1.Size = "30pt";
             char1.Color = labeltextcolor;
 
-            var char2 = new VA.Text.CharacterFormatCells();
+            var char2 = new VA.Text.CharacterCells();
             char2.Font = fci.LabelFontID;
             char2.Size = "16pt";
             char2.Color = labeltextcolor;
 
-            var fmt1 = new VA.Format.ShapeFormatCells();
+            var fmt1 = new VA.Shapes.FormatCells();
             fmt1.LineWeight = 0;
             fmt1.LinePattern = 0;
             fmt1.FillPattern = 0;
 
-            var fmt2 = new VA.Format.ShapeFormatCells();
+            var fmt2 = new VA.Shapes.FormatCells();
             fmt2.LineWeight = 0;
             fmt2.LinePattern = 0;
             fmt2.FillPattern = 0;
 
-            var fmt3 = new VA.Format.ShapeFormatCells();
+            var fmt3 = new VA.Shapes.FormatCells();
             fmt3.LineWeight = 0;
             fmt3.LinePattern = 0;
             fmt3.FillPattern = 0;
 
-            var tb1 = new VA.Text.TextBlockFormatCells();
+            var tb1 = new VA.Text.TextCells();
             tb1.VerticalAlign = 0;
 
-            var para1 = new VA.Text.ParagraphFormatCells();
+            var para1 = new VA.Text.ParagraphCells();
             para1.HorizontalAlign = 2;
 
-            var para2 = new VA.Text.ParagraphFormatCells();
+            var para2 = new VA.Text.ParagraphCells();
             para2.HorizontalAlign = 0;
 
-            var char3 = new VA.Text.CharacterFormatCells();
+            var char3 = new VA.Text.CharacterCells();
 
-            var para3 = new VA.Text.ParagraphFormatCells();
+            var para3 = new VA.Text.ParagraphCells();
             para3.HorizontalAlign = 0;
 
-            var tb3 = new VA.Text.TextBlockFormatCells();
+            var tb3 = new VA.Text.TextCells();
             tb3.VerticalAlign = 0;
 
             foreach (string text in fci.TextBlocks)
@@ -210,11 +210,12 @@ The Prelude, lines 381-389";
                     var shape1 = curpage.DrawRectangle(left, cell1_top - cell1_h, left + cell1_w, cell1_top);
                     shape1.Text = string.Format("{0}", size);
 
-                    var update1 = new VA.ShapeSheet.Update.SRCUpdate();
-                    para1.Apply(update1, 0);
-                    tb1.Apply(update1);
-                    char1.Apply(update1, 0);
-                    fmt1.Apply(update1);
+                    var update1 = new VA.ShapeSheet.Update();
+                    update1.SetFormulas(para1,0);
+                    update1.SetFormulas(char1,0);
+                    update1.SetFormulas(tb1);
+                    update1.SetFormulas(fmt1);
+
                     update1.Execute(shape1);
 
                     double cell2_top = cell1_top;
@@ -238,20 +239,23 @@ The Prelude, lines 381-389";
                         char3.Size = size;
                         char3.Style = (int) (fci.Styles[i]);
 
-                        var update3 = new VA.ShapeSheet.Update.SRCUpdate();
-                        para3.Apply(update3, 0);
-                        tb3.Apply(update3);
-                        char3.Apply(update3, 0);
-                        fmt3.Apply(update3);
+                        var update3 = new VA.ShapeSheet.Update();
+
+                        update3.SetFormulas(para3,0);
+                        update3.SetFormulas(tb3);
+                        update3.SetFormulas(char3,0);
+                        update3.SetFormulas(fmt3);
                         update3.Execute(shape_3);
 
 
                         char2.Font = fci.TargetFontIDs[i];
-                        var update2 = new VA.ShapeSheet.Update.SRCUpdate();
-                        para2.Apply(update2, 0);
-                        //tb1.Apply(update2);
-                        char2.Apply(update2, 0);
-                        fmt2.Apply(update2);
+                        var update2 = new VA.ShapeSheet.Update();
+
+                        update2.SetFormulas(para2,0);
+
+                        update2.SetFormulas(char2, 0);
+                        update2.SetFormulas(fmt2);
+
                         update2.Execute(shape2);
 
 
@@ -265,7 +269,7 @@ The Prelude, lines 381-389";
                     cell1_top = cell2_top;
                 }
 
-                curpage.ResizeToFitContents(1.0, 1.0);
+                curpage.ResizeToFitContents( new VisioAutomation.Drawing.Size(1.0, 1.0));
             }
         }
 
@@ -273,25 +277,32 @@ The Prelude, lines 381-389";
         {
             var text =
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvqxyz\n1234567890\n!@#$%^&*()\n`~_-+=[]{}<>\n\\|;:'\",./?";
-            var text1_x_lines = text.Split(new char[] { '\n' });
+            var text1_x_lines = text.Split('\n');
 
             var page = fci.Document.Pages.Add();
             var dom = new VA.DOM.Document();
 
+            var dom_page = new VA.DOM.Page();
+
+            dom.Pages.Add(dom_page);
             double cy = 8.0;
             for (int fi = 0; fi < fci.TargetFontNames.Count; fi++)
             {
                 var font = fci.TargetFontNames[fi];
 
                 var trect = new VA.Drawing.Rectangle(0, cy - 1.0, 10, cy);
-                var tshape = dom.Drop(rectmaster,stencilname,trect);
-                tshape.Text = new VA.Text.Markup.TextElement(font);
-                tshape.ShapeCells.FillPattern = 0;
-                tshape.ShapeCells.HAlign = 0;
-                tshape.CharFontName = font;
-                tshape.ShapeCells.CharSize = "36pt";
-                tshape.ShapeCells.LinePattern = 0;
-                tshape.ShapeCells.LineWeight = 0;
+                var xshape = new VA.DOM.Shape(rectmaster, stencilname, trect.Center);
+                xshape.Cells.Width = trect.Size.Width;
+                xshape.Cells.Height = trect.Size.Height;
+                dom_page.Shapes.Add(xshape);
+
+                xshape.Text = new VA.Text.Markup.TextElement(font);
+                xshape.Cells.FillPattern = 0;
+                xshape.Cells.ParaHorizontalAlign = 0;
+                xshape.CharFontName = font;
+                xshape.Cells.CharSize = "36pt";
+                xshape.Cells.LinePattern = 0;
+                xshape.Cells.LineWeight = 0;
                 cy -= 2.0;
 
                 for (int ri = 0; ri < text1_x_lines.Length; ri++)
@@ -302,18 +313,22 @@ The Prelude, lines 381-389";
                         double x = 0 + (1.0) * c;
                         var rect = new VA.Drawing.Rectangle(x, cy, x + 0.5, cy + 0.5);
 
-                        var shape = dom.Drop(rectmaster, stencilname,rect);
+                        var shape = new VA.DOM.Shape(rectmaster, stencilname, rect.Center);
+                        shape.Cells.Width = rect.Width;
+                        shape.Cells.Height = rect.Height;
+
+                        dom_page.Shapes.Add(shape);
                         shape.Text = new VA.Text.Markup.TextElement(curline[c].ToString());
-                        shape.ShapeCells.FillPattern = 0;
-                        shape.ShapeCells.CharSize = "18pt";
-                        shape.ShapeCells.LineColor = "rgb(230,230,230)";
-                        shape.ShapeCells.CharStyle = (int) (fci.Styles[fi]);
+                        shape.Cells.FillPattern = 0;
+                        shape.Cells.CharSize = "18pt";
+                        shape.Cells.LineColor = "rgb(230,230,230)";
+                        shape.Cells.CharStyle = (int) (fci.Styles[fi]);
                     }
                     cy -= 1.0;
                 }
             }
-            dom.Render(page);
-            page.ResizeToFitContents(1.0, 1.0);
+            dom.Render(page.Application);
+            page.ResizeToFitContents( new VisioAutomation.Drawing.Size(1.0, 1.0));
         }
 
         private void compare_glyphs(FontCompareInput fci)
@@ -340,6 +355,8 @@ The Prelude, lines 381-389";
                 var page = pages.Add();
                 var dom = new VA.DOM.Document();
 
+                var dom_page = new VA.DOM.Page();
+                dom.Pages.Add(dom_page);
                 double cy = 8.0;
                 for (int j = 0; j < texts[i].Count; j++)
                 {
@@ -350,29 +367,34 @@ The Prelude, lines 381-389";
                         double right = left + col_width;
                         double top = cy;
                         var rect = new VA.Drawing.Rectangle(left, title_bottom, right, top);
-                        var char_sample_title_shape = dom.Drop(rectmaster,stencilname, rect);
+                        var char_sample_title_shape = new VA.DOM.Shape(rectmaster, stencilname, rect);
+                        char_sample_title_shape.Cells.Width = rect.Width;
+                        char_sample_title_shape.Cells.Height = rect.Height;
+
+                        dom_page.Shapes.Add(char_sample_title_shape);
                         char_sample_title_shape.Text = new VA.Text.Markup.TextElement(fci.TargetFontDisplayNames[k]);
-                        char_sample_title_shape.ShapeCells.LinePattern = 0;
-                        char_sample_title_shape.ShapeCells.LineWeight = 0;
-                        char_sample_title_shape.ShapeCells.CharFont = fci.TargetFontIDs[k];
-                        char_sample_title_shape.ShapeCells.FillPattern = 0;
+                        char_sample_title_shape.Cells.LinePattern = 0;
+                        char_sample_title_shape.Cells.LineWeight = 0;
+                        char_sample_title_shape.Cells.CharFont = fci.TargetFontIDs[k];
+                        char_sample_title_shape.Cells.FillPattern = 0;
 
                     }
                     double overlay_title_left = fci.TargetFontNames.Count()*col_width;
 
                     double overlay_title_right = overlay_title_left + col_width;
                     var rectangle = new VA.Drawing.Rectangle(overlay_title_left, title_bottom, overlay_title_right, cy);
-                    var overlay_title_shape = dom.Drop(rectmaster,stencilname,rectangle);
-                    overlay_title_shape.ShapeCells.FillPattern = 0;
-                    overlay_title_shape.ShapeCells.LinePattern = 0;
-                    overlay_title_shape.ShapeCells.LineWeight = 0;
+                    var overlay_title_shape = new VA.DOM.Shape(rectmaster, stencilname, rectangle);
+                    dom_page.Shapes.Add(overlay_title_shape);
+                    overlay_title_shape.Cells.FillPattern = 0;
+                    overlay_title_shape.Cells.LinePattern = 0;
+                    overlay_title_shape.Cells.LineWeight = 0;
                     overlay_title_shape.Text = new VA.Text.Markup.TextElement();
-                    overlay_title_shape.ShapeCells.CharTransparency = "0.3";
+                    overlay_title_shape.Cells.CharTransparency = "0.3";
                     for (int k = 0; k < fci.TargetFontNames.Count(); k++)
                     {
-                        var el = overlay_title_shape.Text.AppendElement(fci.TargetFontDisplayNames[k] + "\n");
-                        el.CharacterFormat.Color = new VA.Drawing.ColorRGB(colorints[k % colorints.Count()]);
-                        el.CharacterFormat.FontID = fci.TargetFontIDs[k];
+                        var el = overlay_title_shape.Text.AddElement(fci.TargetFontDisplayNames[k] + "\n");
+                        el.CharacterCells.Color = (new VA.Drawing.ColorRGB(colorints[k % colorints.Count()])).ToFormula();
+                        el.CharacterCells.Font = fci.TargetFontIDs[k];
                     }
                     cy -= label_height;
 
@@ -385,14 +407,19 @@ The Prelude, lines 381-389";
                         double x1 = x0 + w;
                         double y0 = cy - sample_height;
                         double y1 = cy;
-                        var char_sample_shape = dom.Drop(rectmaster,stencilname,new VA.Drawing.Rectangle(x0, y0, x1, y1));
+                        var rect = new VA.Drawing.Rectangle(x0, y0, x1, y1);
+                        var char_sample_shape = new VA.DOM.Shape(rectmaster,stencilname,rect.Center);
+                        char_sample_shape.Cells.Width = rect.Width;
+                        char_sample_shape.Cells.Height = rect.Height;
+
+                        dom_page.Shapes.Add(char_sample_shape);
                         char_sample_shape.Text = new VA.Text.Markup.TextElement(cur_char);
-                        char_sample_shape.ShapeCells.LinePattern = 0;
-                        char_sample_shape.ShapeCells.LineWeight = 0;
-                        char_sample_shape.ShapeCells.CharSize = bigcharsize;
-                        char_sample_shape.ShapeCells.CharFont = fci.TargetFontIDs[k];
-                        char_sample_shape.ShapeCells.FillPattern = 0;
-                        char_sample_shape.ShapeCells.CharStyle = ((int) fci.Styles[k]).ToString();
+                        char_sample_shape.Cells.LinePattern = 0;
+                        char_sample_shape.Cells.LineWeight = 0;
+                        char_sample_shape.Cells.CharSize = bigcharsize;
+                        char_sample_shape.Cells.CharFont = fci.TargetFontIDs[k];
+                        char_sample_shape.Cells.FillPattern = 0;
+                        char_sample_shape.Cells.CharStyle = ((int) fci.Styles[k]).ToString();
                     }
 
                     for (int k = 0; k < fci.TargetFontNames.Count(); k++)
@@ -400,26 +427,31 @@ The Prelude, lines 381-389";
                         double overlay_left = fci.TargetFontNames.Count()*col_width;
                         double overlay_right = overlay_left + col_width;
                         var rect = new VA.Drawing.Rectangle(overlay_left, cy - col_width, overlay_right, cy);
-                        var overlay_shape = dom.Drop(rectmaster,stencilname,rect);
-                        overlay_shape.ShapeCells.LinePattern = 0;
-                        overlay_shape.ShapeCells.LineWeight = 0;
+
+                        var overlay_shape = new VA.DOM.Shape(rectmaster,stencilname,rect.Center);
+                        overlay_shape.Cells.Width = rect.Width;
+                        overlay_shape.Cells.Height = rect.Height;
+
+                        dom_page.Shapes.Add(overlay_shape);
+                        overlay_shape.Cells.LinePattern = 0;
+                        overlay_shape.Cells.LineWeight = 0;
                         overlay_shape.Text = new VA.Text.Markup.TextElement(cur_char);
-                        overlay_shape.ShapeCells.LinePattern = 0;
-                        overlay_shape.ShapeCells.LineWeight = 0;
-                        overlay_shape.ShapeCells.CharSize = bigcharsize;
-                        overlay_shape.ShapeCells.CharFont = fci.TargetFontIDs[k];
-                        overlay_shape.ShapeCells.FillPattern = 0;
-                        overlay_shape.ShapeCells.CharTransparency = "0.7";
-                        overlay_shape.ShapeCells.CharColor = colors[k % colors.Count()];
-                        overlay_shape.ShapeCells.CharStyle = ((int)fci.Styles[k]).ToString();
+                        overlay_shape.Cells.LinePattern = 0;
+                        overlay_shape.Cells.LineWeight = 0;
+                        overlay_shape.Cells.CharSize = bigcharsize;
+                        overlay_shape.Cells.CharFont = fci.TargetFontIDs[k];
+                        overlay_shape.Cells.FillPattern = 0;
+                        overlay_shape.Cells.CharTransparency = "0.7";
+                        overlay_shape.Cells.CharColor = colors[k % colors.Count()];
+                        overlay_shape.Cells.CharStyle = ((int)fci.Styles[k]).ToString();
                     }
 
                     cy -= sample_height;
 
                     cy -= 1.0; // extra spacing
                 }
-                dom.Render(page);
-                page.ResizeToFitContents(1.0, 1.0);
+                dom.Render(page.Application);
+                page.ResizeToFitContents(new VisioAutomation.Drawing.Size(1.0, 1.0));
 
             }
         }
