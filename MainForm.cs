@@ -345,11 +345,10 @@ The Prelude, lines 381-389";
             double col_width = 3.0;
             double label_height = 0.5;
             double sample_height = col_width;
+            var dom = new VA.DOM.Document();
 
             for (int i = 0; i < texts.Count; i++)
             {
-                var page = pages.Add();
-                var dom = new VA.DOM.Document();
 
                 var dom_page = new VA.DOM.Page();
                 dom.Pages.Add(dom_page);
@@ -435,10 +434,10 @@ The Prelude, lines 381-389";
 
                     cy -= 1.0; // extra spacing
                 }
-                dom.Render(page.Application);
-                page.ResizeToFitContents(new VisioAutomation.Drawing.Size(1.0, 1.0));
+                //page.ResizeToFitContents(new VisioAutomation.Drawing.Size(1.0, 1.0));
 
             }
+            dom.Render(fci.Document.Application);
         }
 
         public static List<List<T>> Split<T>(IEnumerable<T> source, int n)
