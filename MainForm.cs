@@ -313,11 +313,7 @@ The Prelude, lines 381-389";
                         double x = 0 + (1.0) * c;
                         var rect = new VA.Drawing.Rectangle(x, cy, x + 0.5, cy + 0.5);
 
-                        var shape = new VA.DOM.Shape(this.rectmaster, this.stencilname, rect.Center);
-                        shape.Cells.Width = rect.Width;
-                        shape.Cells.Height = rect.Height;
-
-                        dom_page.Shapes.Add(shape);
+                        var shape = dom_page.Shapes.Drop(this.rectmaster, this.stencilname, rect);
                         shape.Text = new VA.Text.Markup.TextElement(curline[c].ToString());
                         shape.Cells.FillPattern = 0;
                         shape.Cells.CharSize = "18pt";
@@ -367,11 +363,7 @@ The Prelude, lines 381-389";
                         double right = left + col_width;
                         double top = cy;
                         var rect = new VA.Drawing.Rectangle(left, title_bottom, right, top);
-                        var char_sample_title_shape = new VA.DOM.Shape(this.rectmaster, this.stencilname, rect);
-                        char_sample_title_shape.Cells.Width = rect.Width;
-                        char_sample_title_shape.Cells.Height = rect.Height;
-
-                        dom_page.Shapes.Add(char_sample_title_shape);
+                        var char_sample_title_shape = dom_page.Shapes.Drop(this.rectmaster, this.stencilname, rect);
                         char_sample_title_shape.Text = new VA.Text.Markup.TextElement(fci.TargetFontDisplayNames[k]);
                         char_sample_title_shape.Cells.LinePattern = 0;
                         char_sample_title_shape.Cells.LineWeight = 0;
@@ -409,11 +401,7 @@ The Prelude, lines 381-389";
                         double y0 = cy - sample_height;
                         double y1 = cy;
                         var rect = new VA.Drawing.Rectangle(x0, y0, x1, y1);
-                        var char_sample_shape = new VA.DOM.Shape(this.rectmaster, this.stencilname,rect.Center);
-                        char_sample_shape.Cells.Width = rect.Width;
-                        char_sample_shape.Cells.Height = rect.Height;
-
-                        dom_page.Shapes.Add(char_sample_shape);
+                        var char_sample_shape = dom_page.Shapes.Drop(this.rectmaster, this.stencilname, rect);
                         char_sample_shape.Text = new VA.Text.Markup.TextElement(cur_char);
                         char_sample_shape.Cells.LinePattern = 0;
                         char_sample_shape.Cells.LineWeight = 0;
@@ -429,11 +417,7 @@ The Prelude, lines 381-389";
                         double overlay_right = overlay_left + col_width;
                         var rect = new VA.Drawing.Rectangle(overlay_left, cy - col_width, overlay_right, cy);
 
-                        var overlay_shape = new VA.DOM.Shape(this.rectmaster, this.stencilname,rect.Center);
-                        overlay_shape.Cells.Width = rect.Width;
-                        overlay_shape.Cells.Height = rect.Height;
-
-                        dom_page.Shapes.Add(overlay_shape);
+                        var overlay_shape = dom_page.Shapes.Drop(this.rectmaster, this.stencilname, rect);
                         overlay_shape.Cells.LinePattern = 0;
                         overlay_shape.Cells.LineWeight = 0;
                         overlay_shape.Text = new VA.Text.Markup.TextElement(cur_char);
